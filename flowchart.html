@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      themeVariables: {
+        fontFamily: 'Arial',
+        fontSize: '16px',
+        primaryColor: '#f9f',
+        primaryTextColor: '#000000',
+        primaryBorderColor: '#333',
+        lineColor: '#333',
+        secondaryColor: '#eef',
+        secondaryTextColor: '#000000',
+        tertiaryColor: '#dfd',
+        tertiaryTextColor: '#000000'
+      }
+    });
+  </script>
+  <style>
+    body {
+      background-color: white;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="mermaid">
+flowchart TD
+    subgraph GitHubCloud [GitHub Pilvi]
+        GHA[GitHub Actions]
+        GHR[GitHub Repository<br/>Koodi & Workflowt]
+        AR[Allure Reportit<br/>Artefaktina]
+        GP[GitHub Pages<br/>Raporttien jakaminen]
+    end
+
+    subgraph SelfHostedRunner [Self-Hosted Runner PC WIN10]
+        SH[Actions Runner<br/>Windows]
+        
+        subgraph TestausYmpäristö
+            AS[Appium Server<br/>Port 4723]
+            NJS[Node.js Runtime]
+        end
+
+        subgraph BuildiYmpäristö
+            PY[Python 3.9+]
+            PK[Python Kirjastot<br/>appium-python-client<br/>pytest<br/>allure-pytest]
+            ADB[Android Debug Bridge<br/>adb server]
+        end
+    end
+
+    subgraph AndroidLaite [Android Laite/Emulaattori - suositus fyysinen laite]
+        AOS[Android OS]
+        SA[Sää-sovellus<br/>fi.sbweather.app]
+        ADBD[ADB Daemon]
+    end
+
+    GHA -- Käynnistää workflowt --> GHR
+    GHA -- Ajaa testit --> SelfHostedRunner
+    SelfHostedRunner -- Hakee koodin --> GHR
+    
+    SH -- Hallitsee --> Testaus-ympäristö
+    SH -- Hallitsee --> Build-ympäristö
+    
+    AS -- Kommunikoi --> ADB
+    ADB -- USB/WiFi-yhteys --> ADBD
+    ADBD -- Kontrolloi --> AOS
+    AOS -- Suorittaa --> SA
+    
+    SH -- Generoi raportit --> AR
+    AR -- Deploytaa --> GP
+
+    style GitHubCloud fill:#f9f,stroke:#333,stroke-width:2px
+    style SelfHostedRunner fill:#eef,stroke:#333,stroke-width:2px
+    style AndroidLaite fill:#dfd,stroke:#333,stroke-width:2px
+  </div>
+</body>
+</html>
