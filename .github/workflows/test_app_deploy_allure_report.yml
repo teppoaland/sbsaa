@@ -4,7 +4,7 @@
 # 3. Generate Allure report AFTER tests
 # 4. Update history (optional)
 
-name: Test app and Deploy Allure Report with Git Storage History
+name: Test app and generate Allure report
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ permissions:
 
 env:
   GIT_STORAGE_REPO: "https://github.com/teppoaland/git_storage.git"
-  PROJECT_NAME: "appium-tests"
+  PROJECT_NAME: "sbsaa-tests"
   PYTHONUTF8: "1"
 
 jobs:
