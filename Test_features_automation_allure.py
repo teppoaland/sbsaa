@@ -16,7 +16,7 @@ from appium.webdriver.common.appiumby import AppiumBy
 # Create timestamp
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-# Set to False if need to have screenshots from all tested views.
+# Set to False if need to have screenshots from all tested views. Testing test parameter...
 SAVE_ONLY_FAILED_SCREENSHOTS = False
 
 # Pytest fixture for setup and teardown
