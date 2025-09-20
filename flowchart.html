@@ -8,7 +8,7 @@
       theme: 'default',
       themeVariables: {
         fontFamily: 'Arial',
-        fontSize: '16px',
+        fontSize: '14px',
         primaryColor: '#f9f',
         primaryTextColor: '#000000',
         primaryBorderColor: '#333',
@@ -16,7 +16,9 @@
         secondaryColor: '#eef',
         secondaryTextColor: '#000000',
         tertiaryColor: '#dfd',
-        tertiaryTextColor: '#000000'
+        tertiaryTextColor: '#000000',
+        quaternaryColor: '#ffe',
+        quaternaryTextColor: '#000000'
       }
     });
   </script>
@@ -24,58 +26,76 @@
     body {
       background-color: white;
       font-family: Arial, sans-serif;
+      margin: 20px;
     }
   </style>
 </head>
 <body>
   <div class="mermaid">
 flowchart TD
-    subgraph GitHubCloud [GitHub Pilvi]
+    subgraph GitHub [GitHub Cloud]
         GHA[GitHub Actions]
-        GHR[GitHub Repository<br/>Koodi & Workflowt]
-        AR[Allure Reportit<br/>Artefaktina]
-        GP[GitHub Pages<br/>Raporttien jakaminen]
+        GHR[sbsaa Repository]
+        GHP[GitHub Pages]
     end
 
-    subgraph SelfHostedRunner [Self-Hosted Runner PC WIN10]
-        SH[Actions Runner<br/>Windows]
-        
-        subgraph TestausYmpäristö
-            AS[Appium Server<br/>Port 4723]
-            NJS[Node.js Runtime]
-        end
-
-        subgraph BuildiYmpäristö
-            PY[Python 3.9+]
-            PK[Python Kirjastot<br/>appium-python-client<br/>pytest<br/>allure-pytest]
-            ADB[Android Debug Bridge<br/>adb server]
-        end
+    subgraph Storage [Git Storage]
+        GSR[git_storage repo]
+        APT[appium-tests/]
+        SBT[sbsaa-tests/]
     end
 
-    subgraph AndroidLaite [Android Laite/Emulaattori - suositus fyysinen laite]
+    subgraph Runner [Self-Hosted Runner WIN10]
+        SH[Actions Runner]
+        AS[Appium Server]
+        PY[Python + pytest]
+        UH[History Manager]
+        AO[Allure Generator]
+        ADB[ADB Bridge]
+    end
+
+    subgraph Device [Android Device]
         AOS[Android OS]
-        SA[Sää-sovellus<br/>fi.sbweather.app]
+        SA[Weather App]
         ADBD[ADB Daemon]
     end
 
-    GHA -- Käynnistää workflowt --> GHR
-    GHA -- Ajaa testit --> SelfHostedRunner
-    SelfHostedRunner -- Hakee koodin --> GHR
-    
-    SH -- Hallitsee --> Testaus-ympäristö
-    SH -- Hallitsee --> Build-ympäristö
-    
-    AS -- Kommunikoi --> ADB
-    ADB -- USB/WiFi-yhteys --> ADBD
-    ADBD -- Kontrolloi --> AOS
-    AOS -- Suorittaa --> SA
-    
-    SH -- Generoi raportit --> AR
-    AR -- Deploytaa --> GP
+    GHA -->|Trigger| SH
+    SH -->|Clone| GHR
+    SH -->|Load History| GSR
+    SH -->|Run Tests| AS
+    AS -->|Control| ADB
+    ADB -->|Connect| ADBD
+    ADBD -->|Execute| SA
+    UH -->|Process| AO
+    AO -->|Generate| GHP
+    AO -->|Save History| GSR
 
-    style GitHubCloud fill:#f9f,stroke:#333,stroke-width:2px
-    style SelfHostedRunner fill:#eef,stroke:#333,stroke-width:2px
-    style AndroidLaite fill:#dfd,stroke:#333,stroke-width:2px
+    style GitHub fill:#f9f
+    style Storage fill:#ffe
+    style Runner fill:#eef
+    style Device fill:#dfd
   </div>
+
+  <h3>Key Architecture Features:</h3>
+  <ul>
+    <li><strong>Git Storage Database:</strong> Centralized history persistence across multiple projects</li>
+    <li><strong>Project Isolation:</strong> Separate namespaces (appium-tests, sbsaa-tests) prevent data contamination</li>
+    <li><strong>Trigger Control:</strong> Manual execution or commit-based with [test] parameter</li>
+    <li><strong>History Management:</strong> Pre/post processing to handle Allure's malformed data injection</li>
+    <li><strong>Real Device Testing:</strong> Hardware-accelerated execution with ADB shell support</li>
+    <li><strong>Scalable Reporting:</strong> Automated deployment to GitHub Pages with trend analysis</li>
+  </ul>
+
+  <h3>Execution Flow:</h3>
+  <ol>
+    <li>Load previous test history from git storage</li>
+    <li>Prepare history files for current test run</li>
+    <li>Execute pytest test suite against real Android device</li>
+    <li>Generate Allure HTML report with historical trends</li>
+    <li>Clean up malformed data that Allure injects</li>
+    <li>Save updated history back to git storage</li>
+    <li>Deploy final report to GitHub Pages</li>
+  </ol>
 </body>
 </html>
