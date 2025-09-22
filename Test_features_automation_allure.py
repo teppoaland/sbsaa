@@ -136,6 +136,7 @@ def check_element(driver, by, value, timeout=10):
         return False
 
 # Test functions for each feature
+@azure_work_item(1)  # Link number to connect test with relevat Azure DevOps item
 @allure.feature("Main View")
 def test_home_tab(driver, app_setup):
     """Test that home tab is visible"""
@@ -153,6 +154,7 @@ def test_oulu_search(driver, app_setup):
     })
     save_screenshot(driver, "Oulu_weather_stations_list", False)
 
+@azure_work_item(3)  # Link number to connect test with relevat Azure DevOps item
 @allure.feature("Location Tests")
 def test_oulu_vihreasaari(driver, app_setup):
     """Test Oulu Vihreäsaari location"""
@@ -167,7 +169,6 @@ def test_oulu_vihreasaari(driver, app_setup):
     assert check_element(driver, AppiumBy.ACCESSIBILITY_ID, "LÄMPÖTILA", 10), "Weather data not loaded for Vihreäsaari"
     save_screenshot(driver, "Weather_oulu_vihreasaari", False)
 
-@azure_work_item(5)  # Link number to connect test with relevat Azure DevOps item
 @allure.feature("Location Tests") 
 def test_oulu_airport(driver, app_setup):
     """Test Oulu airport location"""
