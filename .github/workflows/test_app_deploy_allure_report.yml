@@ -20,8 +20,6 @@ env:
   GIT_STORAGE_REPO: "https://github.com/teppoaland/git_storage.git"
   PROJECT_NAME: "sbsaa-tests"
   PYTHONUTF8: "1"
-
-env:
   AZURE_DEVOPS_ORG_URL: https://dev.azure.com/ttapani-solutions
   AZURE_DEVOPS_PROJECT: test-automation-framework
   AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
