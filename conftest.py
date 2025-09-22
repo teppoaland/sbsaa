@@ -78,7 +78,7 @@ def pytest_runtest_logreport(report):
     if not AZURE_INTEGRATION_AVAILABLE:
         return
         
-    # Only process the main test execution phase
+    # Only process the main test execution phase.
     if report.when != "call":
         return
     
