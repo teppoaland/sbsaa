@@ -24,6 +24,10 @@ except ImportError as e:
     print(f"Azure DevOps integration not available: {e}")
 
 
+# Global registry to store Azure context between pytest phases
+_azure_test_contexts = {}
+
+
 @pytest.fixture(autouse=True)
 def azure_devops_integration_fixture(request):
     """
@@ -45,6 +49,7 @@ def azure_devops_integration_fixture(request):
         
         # Get test function name
         test_name = request.node.name
+        test_nodeid = request.node.nodeid
         
         # Check if test has Azure work item mapping
         work_item_id = mapper.get_work_item_id(test_name)
@@ -52,17 +57,23 @@ def azure_devops_integration_fixture(request):
         if work_item_id:
             print(f"Azure DevOps: Test {test_name} linked to work item {work_item_id}")
             
-            # Store for use in test result reporting
-            request.node.azure_work_item_id = work_item_id
-            request.node.azure_integration = azure
+            # Store in global registry for report hook to access
+            _azure_test_contexts[test_nodeid] = {
+                'work_item_id': work_item_id,
+                'azure_client': azure
+            }
         else:
             # Check if test has decorator work item ID
             test_func = getattr(request.node.obj, request.node.name, None) if hasattr(request.node, 'obj') else None
             if test_func and hasattr(test_func, 'azure_work_item_id'):
                 decorator_id = test_func.azure_work_item_id
                 print(f"Azure DevOps: Found decorator work item ID {decorator_id} for {test_name}")
-                request.node.azure_work_item_id = decorator_id
-                request.node.azure_integration = azure
+                
+                # Store in global registry
+                _azure_test_contexts[test_nodeid] = {
+                    'work_item_id': decorator_id,
+                    'azure_client': azure
+                }
             else:
                 print(f"Azure DevOps: No work item mapping found for {test_name}")
                 
@@ -71,6 +82,10 @@ def azure_devops_integration_fixture(request):
 
 
 def pytest_runtest_logreport(report):
+    """
+    Pytest hook that runs after each test phase (setup, call, teardown)
+    Automatically updates Azure DevOps based on test results
+    """
     if not AZURE_INTEGRATION_AVAILABLE:
         return
         
@@ -78,25 +93,17 @@ def pytest_runtest_logreport(report):
     if report.when != "call":
         return
     
-    print(f"DEBUG: Processing {report.nodeid}, has azure_work_item_id: {hasattr(report, 'azure_work_item_id')}")
+    print(f"DEBUG: Processing {report.nodeid}, in azure contexts: {report.nodeid in _azure_test_contexts}")
     
-    # Get Azure context from the test node instead of report
-    if hasattr(report, 'nodeid'):
-        # Try to get the test node and check for Azure context there
-        try:
-            # Access the actual test item to get stored Azure context
-            # This is the missing link - we need to transfer context from node to report
-            pass
-        except:
-            pass
-    
-    # Only run if we have Azure DevOps integration configured
-    if not hasattr(report, 'azure_work_item_id') or not hasattr(report, 'azure_integration'):
-        print(f"DEBUG: Skipping Azure update - missing context for {report.nodeid}")
+    # Check if this test has Azure integration configured
+    if report.nodeid not in _azure_test_contexts:
+        print(f"DEBUG: Skipping Azure update - no context for {report.nodeid}")
         return
     
-    azure = report.azure_integration
-    work_item_id = report.azure_work_item_id
+    # Get Azure context from global registry
+    context = _azure_test_contexts[report.nodeid]
+    work_item_id = context['work_item_id']
+    azure = context['azure_client']
     
     try:
         print(f"Azure DevOps: Updating work item {work_item_id} with test results")
