@@ -142,7 +142,7 @@ def test_home_tab(driver, app_setup):
     assert check_element(driver, AppiumBy.ACCESSIBILITY_ID, "KOTI\nTab 1 of 3", 10), "HOME button not found"
     save_screenshot(driver, "HOME_button_main", False)
 
-@azure_work_item(2)  # Replace with actual work item ID after setup
+@azure_work_item(4)  # Replace with actual work item ID after setup
 @allure.feature("Search Functionality")
 def test_oulu_search(driver, app_setup):
     """Test search functionality for Oulu"""
