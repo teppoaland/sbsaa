@@ -1,10 +1,10 @@
 {
-  "test_search_error_handling": {
+  "test_home_tab": {
     "work_item_id": 1,
     "work_item_type": "Test Case",
     "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/1"
   },
-  "test_search_error_handling": {
+  "test_oulu_vihreasaari": {
     "work_item_id": 3,
     "work_item_type": "Test Case",
     "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/3"
