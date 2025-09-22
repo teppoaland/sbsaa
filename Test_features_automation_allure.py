@@ -142,7 +142,7 @@ def test_home_tab(driver, app_setup):
     assert check_element(driver, AppiumBy.ACCESSIBILITY_ID, "KOTI\nTab 1 of 3", 10), "HOME button not found"
     save_screenshot(driver, "HOME_button_main", False)
 
-@azure_work_item(5)  # Link number to connect test with relevat Azure DevOps item
+@azure_work_item(4)  # Link number to connect test with relevat Azure DevOps item
 @allure.feature("Search Functionality")
 def test_oulu_search(driver, app_setup):
     """Test search functionality for Oulu"""
@@ -167,7 +167,7 @@ def test_oulu_vihreasaari(driver, app_setup):
     assert check_element(driver, AppiumBy.ACCESSIBILITY_ID, "LÄMPÖTILA", 10), "Weather data not loaded for Vihreäsaari"
     save_screenshot(driver, "Weather_oulu_vihreasaari", False)
 
-@azure_work_item(4)  # Link number to connect test with relevat Azure DevOps item
+@azure_work_item(5)  # Link number to connect test with relevat Azure DevOps item
 @allure.feature("Location Tests") 
 def test_oulu_airport(driver, app_setup):
     """Test Oulu airport location"""
