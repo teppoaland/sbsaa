@@ -16,6 +16,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
 from appium.webdriver.common.appiumby import AppiumBy
+from azure_integration.azure_devops_client import azure_work_item
 
 # Create timestamp
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -141,7 +142,7 @@ def test_home_tab(driver, app_setup):
     assert check_element(driver, AppiumBy.ACCESSIBILITY_ID, "KOTI\nTab 1 of 3", 10), "HOME button not found"
     save_screenshot(driver, "HOME_button_main", False)
 
-@azure_work_item(12345)  # Replace with actual work item ID after setup
+@azure_work_item(2)  # Replace with actual work item ID after setup
 @allure.feature("Search Functionality")
 def test_oulu_search(driver, app_setup):
     """Test search functionality for Oulu"""
