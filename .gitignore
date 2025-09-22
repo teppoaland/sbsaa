@@ -6,10 +6,16 @@ logs/
 *.log
 venv/
 tmp/
-.env/
+.env
+.env.local
+.env.production
 *.tmp
 *.bak
 .vscode/settings.json
 .vscode/launch.json
 allure-report/
 allure-results/
+azure_credentials.json
+*.pat
+config/test_mapping_local.json
+config/azure_local.json

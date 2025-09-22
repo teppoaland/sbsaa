@@ -1,8 +1,12 @@
+# File location:  sbsaa/Test_features_automation_allure.py
+
 import time
 import os
 import sys
 import pytest
 import allure
+import json
+import subprocess
 from allure_commons.types import AttachmentType
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
@@ -16,12 +20,68 @@ from appium.webdriver.common.appiumby import AppiumBy
 # Create timestamp
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-# Set to False if need to have screenshots from all tested views. Testing test parameter...
+# Set to False if need to have screenshots from all tested views - not working as expected. Keep False -value to get any image
 SAVE_ONLY_FAILED_SCREENSHOTS = False
+
+# Global variable to store app version.
+tested_app_version = "Unknown"
+
+def get_app_version(package_name="fi.sbweather.app"):
+    """Get app version using ADB"""
+    try:
+        # Get app version using ADB
+        result = subprocess.run([
+            'adb', 'shell', 'dumpsys', 'package', package_name, '|', 
+            'grep', '-E', 'versionCode|versionName'
+        ], capture_output=True, text=True, shell=True)
+        
+        if result.returncode == 0:
+            lines = result.stdout.strip().split('\n')
+            version_name = "Unknown"
+            version_code = "Unknown"
+            
+            for line in lines:
+                if 'versionName=' in line:
+                    version_name = line.split('versionName=')[1].strip()
+                elif 'versionCode=' in line:
+                    version_code = line.split('versionCode=')[1].split()[0]
+            
+            return f"{version_name} (build {version_code})"
+        else:
+            # Alternative method - use pm command
+            result = subprocess.run([
+                'adb', 'shell', 'pm', 'dump', package_name, '|', 
+                'grep', 'versionName'
+            ], capture_output=True, text=True, shell=True)
+            
+            if result.returncode == 0 and result.stdout:
+                version_line = result.stdout.strip().split('\n')[0]
+                if 'versionName=' in version_line:
+                    return version_line.split('versionName=')[1].strip()
+    
+    except Exception as e:
+        print(f"Error getting app version: {e}")
+    
+    return "Unknown"
+
+def save_version_info(version):
+    """Save version info to a local file for workflow to use"""
+    version_data = {
+        "tested_version": version,
+        "test_timestamp": datetime.now().isoformat(),
+        "app_package": "fi.sbweather.app"
+    }
+    
+    with open("tested_app_version.json", "w") as f:
+        json.dump(version_data, f, indent=2)
+    
+    print(f"[VERSION-INFO] Tested app version: {version}")
 
 # Pytest fixture for setup and teardown
 @pytest.fixture(scope="function")
 def driver():
+    global tested_app_version
+    
     options = UiAutomator2Options()
     options.platform_name = "Android"
     options.device_name = "Android_test_device"  
@@ -32,6 +92,15 @@ def driver():
     options.full_reset = False
 
     driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+    
+    # Get app version on first test run
+    if tested_app_version == "Unknown":
+        tested_app_version = get_app_version()
+        save_version_info(tested_app_version)
+        
+        # Add version to Allure environment info
+        allure.dynamic.parameter("App Version", tested_app_version)
+    
     yield driver
     driver.quit()
 
@@ -65,13 +134,14 @@ def check_element(driver, by, value, timeout=10):
     except TimeoutException:
         return False
 
-# Selkeät, erilliset testifunktiot jokaiselle testitapaukselle
+# Test functions for each feature
 @allure.feature("Main View")
 def test_home_tab(driver, app_setup):
     """Test that home tab is visible"""
     assert check_element(driver, AppiumBy.ACCESSIBILITY_ID, "KOTI\nTab 1 of 3", 10), "HOME button not found"
     save_screenshot(driver, "HOME_button_main", False)
 
+@azure_work_item(12345)  # Replace with actual work item ID after setup
 @allure.feature("Search Functionality")
 def test_oulu_search(driver, app_setup):
     """Test search functionality for Oulu"""
@@ -85,7 +155,7 @@ def test_oulu_search(driver, app_setup):
 @allure.feature("Location Tests")
 def test_oulu_vihreasaari(driver, app_setup):
     """Test Oulu Vihreäsaari location"""
-    test_oulu_search(driver, app_setup)  # Kutsu hakutoiminnallisuus
+    test_oulu_search(driver, app_setup)
     
     element = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((AppiumBy.ACCESSIBILITY_ID, "Oulu Vihreäsaari"))
@@ -99,7 +169,7 @@ def test_oulu_vihreasaari(driver, app_setup):
 @allure.feature("Location Tests") 
 def test_oulu_airport(driver, app_setup):
     """Test Oulu airport location"""
-    test_oulu_search(driver, app_setup)  # Kutsu hakutoiminnallisuus
+    test_oulu_search(driver, app_setup)
     
     element = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((AppiumBy.ACCESSIBILITY_ID, "Oulu lentoasema"))
