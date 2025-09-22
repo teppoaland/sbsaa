@@ -82,6 +82,8 @@ def pytest_runtest_logreport(report):
     if report.when != "call":
         return
     
+    print(f"DEBUG: Processing {report.nodeid}, has azure_work_item_id: {hasattr(report, 'azure_work_item_id')}")
+    
     # Only run if we have Azure DevOps integration configured
     if not hasattr(report, 'azure_work_item_id') or not hasattr(report, 'azure_integration'):
         return
