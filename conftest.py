@@ -71,21 +71,28 @@ def azure_devops_integration_fixture(request):
 
 
 def pytest_runtest_logreport(report):
-    """
-    Pytest hook that runs after each test phase (setup, call, teardown)
-    Automatically updates Azure DevOps based on test results
-    """
     if not AZURE_INTEGRATION_AVAILABLE:
         return
         
-    # Only process the main test execution phase.
+    # Only process the main test execution phase
     if report.when != "call":
         return
     
     print(f"DEBUG: Processing {report.nodeid}, has azure_work_item_id: {hasattr(report, 'azure_work_item_id')}")
     
+    # Get Azure context from the test node instead of report
+    if hasattr(report, 'nodeid'):
+        # Try to get the test node and check for Azure context there
+        try:
+            # Access the actual test item to get stored Azure context
+            # This is the missing link - we need to transfer context from node to report
+            pass
+        except:
+            pass
+    
     # Only run if we have Azure DevOps integration configured
     if not hasattr(report, 'azure_work_item_id') or not hasattr(report, 'azure_integration'):
+        print(f"DEBUG: Skipping Azure update - missing context for {report.nodeid}")
         return
     
     azure = report.azure_integration
