@@ -1,31 +1,44 @@
-variables:
-  GITHUB_PAT_TOKEN: $(GITHUB-PAT)  # This is correct - references your variable
+# azure-trigger-test.yml
+trigger: none  # Manual only
 
-script: |
-  # Azure converts GITHUB-PAT to GITHUB_PAT in environment variables
-  $token = $env:GITHUB_PAT  # Note: underscore, not hyphen
-  if ([string]::IsNullOrEmpty($token)) {
-      Write-Error "GITHUB_PAT is empty!"
-      exit 1
-  }
-  
-  $repoUrl = "https://github.com/teppoaland/sbsaa.git"
-  $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
-  
-  if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
-  
-  # Fix the PowerShell syntax error with curly braces
-  git clone https://${token}@github.com/teppoaland/sbsaa.git $tempDir
-  cd $tempDir
-  
-  git config user.name "azure-pipelines"
-  git config user.email "azure-pipelines@microsoft.com"
-  git commit --allow-empty -m "[test] Trigger automated tests from Azure"
-  git push origin main
-  
-  if ($LASTEXITCODE -eq 0) {
-      Write-Host "SUCCESS: Trigger commit pushed to GitHub"
-  } else {
-      Write-Error "FAILED: Could not push trigger commit"
-      exit 1
-  }
+pool:
+  name: 'Default'  # Your self-hosted agent
+
+variables:
+  GITHUB_PAT_TOKEN: $(GITHUB-PAT)  # Secret stored in Azure DevOps
+
+steps:
+- checkout: none  # We do manual clone
+
+- task: PowerShell@2
+  displayName: 'Push trigger commit to GitHub'
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Azure converts GITHUB-PAT to GITHUB_PAT in environment variables
+      $token = $env:GITHUB_PAT
+      if ([string]::IsNullOrEmpty($token)) {
+          Write-Error "GITHUB_PAT is empty!"
+          exit 1
+      }
+      
+      $repoUrl = "https://github.com/teppoaland/sbsaa.git"
+      $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
+      
+      if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
+      
+      # Use direct token in clone URL
+      git clone https://${token}@github.com/teppoaland/sbsaa.git $tempDir
+      cd $tempDir
+      
+      git config user.name "azure-pipelines"
+      git config user.email "azure-pipelines@microsoft.com"
+      git commit --allow-empty -m "[test] Trigger automated tests from Azure"
+      git push origin main
+      
+      if ($LASTEXITCODE -eq 0) {
+          Write-Host "SUCCESS: Trigger commit pushed to GitHub"
+      } else {
+          Write-Error "FAILED: Could not push trigger commit"
+          exit 1
+      }
