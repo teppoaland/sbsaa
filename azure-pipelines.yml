@@ -1,16 +1,13 @@
 # azure-trigger-test.yml
 trigger: none  # Manual only
-
 pool:
-  vmImage: 'windows-latest'  # Instead of name: 'Default'
-
+  name: 'Default'  # Your self-hosted agent
 variables:
-  GITHUB_REPO: "https://github.com/teppoaland/sbsaa.git"  # Your GH repo
-  GITHUB_PAT: $(GITHUB_PAT)  # GitHub token stored as secret in pipeline
-
+  GITHUB_REPO: "https://github.com/teppoaland/sbsaa.git"
+  GITHUB_PAT: $(GITHUB_PAT)
 steps:
-- checkout: none  # We will clone manually
-
+- checkout: self  # Let Azure do normal checkout
+  clean: true
 - task: PowerShell@2
   displayName: 'Trigger GH Actions with [test] commit'
   inputs:
