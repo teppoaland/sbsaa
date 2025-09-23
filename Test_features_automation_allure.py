@@ -93,8 +93,8 @@ def driver():
     options = UiAutomator2Options()
     options.platform_name = "Android"
     options.device_name = "Android Device"
-    options.app_package = "com.foreca.yrweather"
-    options.app_activity = "com.foreca.yrweather.MainActivity"
+    options.app_package = "fi.sbweather.app"
+    options.app_activity = "fi.sbweather.app.MainActivity"
     options.no_reset = True
     options.full_reset = False
     
@@ -107,7 +107,7 @@ def driver():
 @pytest.fixture
 def app_setup(driver):
     """Setup app for each test"""
-    package_name = "com.foreca.yrweather"
+    package_name = "fi.sbweather.app"
     
     try:
         # Launch app using monkey command for reliability
