@@ -4,20 +4,12 @@ trigger: none  # Manual only
 pool:
   name: 'Default'  # Your self-hosted agent
 
-# Explicitly reference the GitHub repo and branch
-resources:
-  repositories:
-    - repository: my_github_repo
-      type: github
-      name: teppoaland/sbsaa
-      ref: refs/heads/main  # Use 'main' branch explicitly
-
 variables:
   GITHUB_REPO: "https://github.com/teppoaland/sbsaa.git"
   GITHUB_PAT: $(GITHUB_PAT)  # Stored as a secret in Azure DevOps
 
 steps:
-- checkout: none  # We will clone manually
+- checkout: none  # Do not automatically fetch any repository
 
 - task: PowerShell@2
   displayName: 'Push trigger commit to GitHub'
@@ -27,7 +19,6 @@ steps:
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
       if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
 
-      # Use secret directly
       $token = $env:GITHUB_PAT
       git clone https://$token@github.com/teppoaland/sbsaa.git $tempDir
 
@@ -35,7 +26,6 @@ steps:
       git config user.name "azure-pipelines"
       git config user.email "azure-pipelines@microsoft.com"
 
-      # Empty commit to trigger GH Actions
       git commit --allow-empty -m "[test] Trigger automated tests from Azure"
       git push origin main
 
