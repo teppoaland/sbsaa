@@ -104,26 +104,27 @@ class AzureDevOpsClient:
         print(f"Created User Story: {work_item.id} - {title}")
         return work_item.id
     
-    def create_test_case(self, title: str, test_steps: str, linked_story_id: int = None) -> int:
-        """Create a Test Case work item"""
+    def create_test_case(self, title: str, description: str = "", test_steps_xml: str = "", linked_story_id: int = None) -> int:
+        """Create a Test Case work item with proper XML steps"""
         fields = {
             'System.Title': title,
             'System.WorkItemType': 'Test Case',
             'System.State': 'Design',
-            'Microsoft.VSTS.TCM.Steps': test_steps
+            'System.Description': description,
+            'Microsoft.VSTS.TCM.Steps': test_steps_xml  # Proper XML format
         }
         
+        if linked_story_id:
+            fields['System.Parent'] = linked_story_id
+        
+        # Create work item
         work_item = self.work_item_client.create_work_item(
             document=[{"op": "add", "path": f"/fields/{field}", "value": value} 
-                     for field, value in fields.items()],
+                    for field, value in fields.items() if value],
             project=self.config['project'],
             type='Test Case'
         )
-        
-        if linked_story_id:
-            self.link_work_items(work_item.id, linked_story_id, 'Tests')
-        
-        print(f"Created Test Case: {work_item.id} - {title}")
+    
         return work_item.id
     
     def create_bug_from_test_failure(self, test_name: str, error_details: str, 
