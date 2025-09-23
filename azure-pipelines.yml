@@ -1,15 +1,15 @@
 # azure-trigger-test.yml
-trigger: none  # Manual only
+trigger: none
 
 pool:
-  name: 'Default'  # Your self-hosted agent
+  name: 'Default'
 
 variables:
   GITHUB_REPO: "https://github.com/teppoaland/sbsaa.git"
-  GITHUB_PAT: $(GITHUB_PAT)  # Stored as a secret in Azure DevOps
+  GITHUB_PAT: $(GITHUB_PAT)  # Secret in Azure DevOps
 
 steps:
-- checkout: none  # Do not automatically fetch any repository
+- checkout: none
 
 - task: PowerShell@2
   displayName: 'Push trigger commit to GitHub'
@@ -19,10 +19,11 @@ steps:
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
       if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
 
+      # Use environment variable directly
       $token = $env:GITHUB_PAT
       git clone https://$token@github.com/teppoaland/sbsaa.git $tempDir
-
       cd $tempDir
+
       git config user.name "azure-pipelines"
       git config user.email "azure-pipelines@microsoft.com"
 
@@ -35,4 +36,3 @@ steps:
       } else {
         Write-Error "FAILED: Could not push trigger commit"
         exit 1
-      }
