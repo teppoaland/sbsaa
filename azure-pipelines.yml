@@ -1,23 +1,13 @@
-# azure-trigger-test.yml
-trigger: none
+trigger: none  # manual only
 
 pool:
   name: 'Default'
 
-# 1. Define the repository resource to prevent initial parsing errors
-resources:
-  repositories:
-    - repository: github_repo
-      type: git
-      name: teppoaland/sbsaa
-      ref: main
-
 variables:
-  # 2. Remove the circular reference by defining a new variable name
-  GITHUB_PAT_TOKEN: $(GITHUB-PAT) # The secret's name in Azure DevOps is now "GITHUB-PAT"
+  GITHUB_PAT_TOKEN: $(GITHUB-PAT)  # Secret variable in Azure DevOps
 
 steps:
-- checkout: none
+- checkout: none  # don't fetch anything
 
 - task: PowerShell@2
   displayName: 'Push trigger commit to GitHub'
@@ -27,21 +17,14 @@ steps:
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
       if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
 
-      # 3. Correctly use the environment variable
-      $token = "$env:GITHUB_PAT_TOKEN"
-      Write-Host "Cloning repository..."
+      $token = $env:GITHUB_PAT_TOKEN
       git clone "https://$token@github.com/teppoaland/sbsaa.git" $tempDir
-      
       cd $tempDir
 
       git config user.name "azure-pipelines"
       git config user.email "azure-pipelines@microsoft.com"
 
-      git commit --allow-empty -m "[test] Trigger automated tests from Azure"
-      
-      # 4. Optionally, add [skip ci] to prevent triggering another Azure Pipeline run
-      # git commit --allow-empty -m "[test] Trigger automated tests from Azure [skip ci]"
-      
+      git commit --allow-empty -m "[test] Trigger automated tests from Azure [skip ci]"
       git push origin main
 
       if ($LASTEXITCODE -eq 0) {
