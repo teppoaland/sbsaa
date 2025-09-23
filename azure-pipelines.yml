@@ -1,44 +1,44 @@
 # azure-trigger-test.yml
-trigger: none  # Manual only
+trigger: none
 
 pool:
-  name: 'Default'  # Your self-hosted agent
+  name: 'Default'
 
 variables:
-  GITHUB_PAT_TOKEN: $(GITHUB-PAT)  # Secret stored in Azure DevOps
+  GITHUB_PAT: $(GITHUB-PAT)
 
 steps:
-- checkout: none  # We do manual clone
+- checkout: none
 
 - task: PowerShell@2
   displayName: 'Push trigger commit to GitHub'
   inputs:
     targetType: 'inline'
     script: |
-      # Azure converts GITHUB-PAT to GITHUB_PAT in environment variables
       $token = $env:GITHUB_PAT
+      
       if ([string]::IsNullOrEmpty($token)) {
-          Write-Error "GITHUB_PAT is empty!"
+          Write-Error "GitHub PAT token is missing"
           exit 1
       }
       
-      $repoUrl = "https://github.com/teppoaland/sbsaa.git"
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
+      if (Test-Path $tempDir) { 
+          Remove-Item $tempDir -Recurse -Force 
+      }
       
-      if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
-      
-      # Use direct token in clone URL
-      git clone https://${token}@github.com/teppoaland/sbsaa.git $tempDir
+      git clone "https://$token@github.com/teppoaland/sbsaa.git" $tempDir
       cd $tempDir
       
       git config user.name "azure-pipelines"
       git config user.email "azure-pipelines@microsoft.com"
-      git commit --allow-empty -m "[test] Trigger automated tests from Azure"
+      
+      git commit --allow-empty -m "[test] Trigger from Azure"
       git push origin main
       
       if ($LASTEXITCODE -eq 0) {
-          Write-Host "SUCCESS: Trigger commit pushed to GitHub"
+          Write-Host "SUCCESS: GitHub Actions triggered"
       } else {
-          Write-Error "FAILED: Could not push trigger commit"
+          Write-Error "Push failed"
           exit 1
       }
