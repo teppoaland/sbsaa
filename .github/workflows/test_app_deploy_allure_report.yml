@@ -108,7 +108,7 @@ jobs:
           }
         shell: powershell
 
-      # 6. RUN TESTS FIRST - generates new results in allure-results
+      # 6. RUN TESTS FIRST - generates new results in allure-results - If needed add app install call here before running test automation
       - name: Run Appium tests with Allure reporting
         shell: powershell
         run: |

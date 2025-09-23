@@ -203,7 +203,7 @@ class AzureDevOpsClient:
         if test_status == "PASSED":
             updates.append({"op": "add", "path": "/fields/System.State", "value": "Closed"})
         elif test_status == "FAILED":
-            updates.append({"op": "add", "path": "/fields/System.State", "value": "Active"})
+            updates.append({"op": "add", "path": "/fields/System.State", "value": "Ready"})
         
         if execution_details:
             updates.append({
