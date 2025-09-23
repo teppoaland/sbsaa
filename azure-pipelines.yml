@@ -4,9 +4,17 @@ trigger: none
 pool:
   name: 'Default'
 
+# 1. Define the repository resource to prevent initial parsing errors
+resources:
+  repositories:
+    - repository: github_repo
+      type: git
+      name: teppoaland/sbsaa
+      ref: main
+
 variables:
-  GITHUB_REPO: "https://github.com/teppoaland/sbsaa.git"
-  GITHUB_PAT: $(GITHUB_PAT)  # Secret in Azure DevOps
+  # 2. Remove the circular reference by defining a new variable name
+  GITHUB_PAT_TOKEN: $(GITHUB-PAT) # The secret's name in Azure DevOps is now "GITHUB-PAT"
 
 steps:
 - checkout: none
@@ -19,20 +27,26 @@ steps:
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
       if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
 
-      # Use environment variable directly
-      $token = $env:GITHUB_PAT
-      git clone https://$token@github.com/teppoaland/sbsaa.git $tempDir
+      # 3. Correctly use the environment variable
+      $token = "$env:GITHUB_PAT_TOKEN"
+      Write-Host "Cloning repository..."
+      git clone "https://$token@github.com/teppoaland/sbsaa.git" $tempDir
+      
       cd $tempDir
 
       git config user.name "azure-pipelines"
       git config user.email "azure-pipelines@microsoft.com"
 
       git commit --allow-empty -m "[test] Trigger automated tests from Azure"
+      
+      # 4. Optionally, add [skip ci] to prevent triggering another Azure Pipeline run
+      # git commit --allow-empty -m "[test] Trigger automated tests from Azure [skip ci]"
+      
       git push origin main
 
       if ($LASTEXITCODE -eq 0) {
         Write-Host "SUCCESS: Trigger commit pushed to GitHub"
-        Write-Host "GitHub Actions will handle the rest independently"
       } else {
         Write-Error "FAILED: Could not push trigger commit"
         exit 1
+      }
