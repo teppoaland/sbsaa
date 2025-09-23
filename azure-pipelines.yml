@@ -1,113 +1,26 @@
-# azure-pipelines.yml
-trigger: none  # Disable automatic triggers - manual only
+# azure-trigger-gh.yml
+trigger: none  # Manual only
 
 pool:
-  name: 'Default'  # Use your self-hosted agent
+  name: 'Default'  # self-hosted runner
 
 variables:
-  PYTHONUTF8: "1"
-  AZURE_DEVOPS_ORG_URL: https://dev.azure.com/ttapani-solutions
-  AZURE_DEVOPS_PROJECT: test-automation-framework
-  AZURE_DEVOPS_PAT: $(AZURE_PAT)  # Set this in pipeline variables
-  GIT_STORAGE_REPO: "https://github.com/teppoaland/git_storage.git"
-  PROJECT_NAME: "sbsaa-tests"
+  GIT_REPO: "https://github.com/teppoaland/sbsaa-tests.git"
+  GIT_USER: "azure-bot"
+  GIT_EMAIL: "azure-bot@company.com"
 
 steps:
-- checkout: self
-  fetchDepth: 0
-
 - task: PowerShell@2
-  displayName: 'Clone Git Storage Repository'
+  displayName: 'Trigger GH Actions via empty commit'
   inputs:
     targetType: 'inline'
     script: |
-      if (Test-Path "storage") {
-        Remove-Item -Path "storage" -Recurse -Force
-      }
-      git clone $(GIT_STORAGE_REPO) storage
-      Write-Host "Git storage repository cloned successfully"
-
-- task: PowerShell@2
-  displayName: 'Setup Allure History'
-  inputs:
-    targetType: 'inline'
-    script: |
-      New-Item -ItemType Directory -Path "./allure-results/history" -Force
-      $historyPath = "storage/allure-history/$(PROJECT_NAME)"
-      if (Test-Path $historyPath) {
-        Copy-Item -Path "$historyPath/*" -Destination "./allure-results/history/" -Force -Recurse -ErrorAction SilentlyContinue
-        Write-Host "SUCCESS: History files loaded from git storage"
-      } else {
-        Write-Host "INFO: No previous history found in git storage"
-      }
-
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.9'
-  displayName: 'Use Python 3.9'
-
-- task: PowerShell@2
-  displayName: 'Install Dependencies'
-  inputs:
-    targetType: 'inline'
-    script: |
-      python -m pip install --upgrade pip
-      python -m pip install -r requirements.txt
-      python -m pip install allure-pytest
-
-- task: PowerShell@2
-  displayName: 'Run Appium Tests'
-  inputs:
-    targetType: 'inline'
-    script: |
-      pytest --alluredir=allure-results -v -s Test_features_automation_allure.py
-  continueOnError: true
-
-- task: PowerShell@2
-  displayName: 'Generate Allure Report'
-  inputs:
-    targetType: 'inline'
-    script: |
-      python update_allure_history.py -v
-      python allure_operations.py --install --generate --verbose
-      python update_allure_history.py --post-cleanup -v
-  condition: always()
-
-- task: PowerShell@2
-  displayName: 'Save History to Git Storage'
-  inputs:
-    targetType: 'inline'
-    script: |
-      cd storage
-      git config user.name "azure-pipelines"
-      git config user.email "azure-pipelines@microsoft.com"
+      git config --global user.name "$(GIT_USER)"
+      git config --global user.email "$(GIT_EMAIL)"
       
-      $storageHistoryPath = "allure-history/$(PROJECT_NAME)"
-      New-Item -ItemType Directory -Path $storageHistoryPath -Force
-      
-      if (Test-Path "../allure-report/history") {
-        Copy-Item -Path "../allure-report/history/*" -Destination $storageHistoryPath -Force -Recurse -ErrorAction SilentlyContinue
-        git add $storageHistoryPath
-        $commitMessage = "Update $(PROJECT_NAME) history from Azure Pipeline - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-        
-        $status = git status --porcelain
-        if ($status) {
-          git commit -m $commitMessage
-          git push origin main
-          Write-Host "SUCCESS: History committed to git storage"
-        }
-      }
-      cd ..
-  condition: always()
-
-- task: PublishTestResults@2
-  inputs:
-    testResultsFiles: 'allure-results/*.xml'
-    testRunTitle: 'Sää App Automated Tests'
-  condition: always()
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathToPublish: 'allure-report'
-    artifactName: 'allure-report'
-  condition: always()
+      if (-Not (Test-Path "repo")) { git clone $(GIT_REPO) repo }
+      cd repo
+      echo "# trigger test $(Get-Date)" >> trigger.log
+      git add trigger.log
+      git commit -m "[test] Triggered from Azure"
+      git push origin main
