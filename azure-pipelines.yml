@@ -1,14 +1,10 @@
-trigger: none  # manual only
-
+trigger: none
 pool:
   name: 'Default'
-
 variables:
-  GITHUB_PAT_TOKEN: $(GITHUB-PAT)  # Secret variable in Azure DevOps
-
+  GITHUB_PAT_TOKEN: $(GITHUB-PAT)
 steps:
-- checkout: none  # don't fetch anything
-
+- checkout: none
 - task: PowerShell@2
   displayName: 'Push trigger commit to GitHub'
   inputs:
@@ -16,20 +12,21 @@ steps:
     script: |
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
       if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
-
-      $token = $env:GITHUB_PAT_TOKEN
+      
+      $token = "$env:GITHUB_PAT_TOKEN"
+      Write-Host "Token available: $(![string]::IsNullOrEmpty($token))"
+      
       git clone "https://$token@github.com/teppoaland/sbsaa.git" $tempDir
       cd $tempDir
-
+      
       git config user.name "azure-pipelines"
       git config user.email "azure-pipelines@microsoft.com"
-
       git commit --allow-empty -m "[test] Trigger automated tests from Azure [skip ci]"
       git push origin main
-
+      
       if ($LASTEXITCODE -eq 0) {
-        Write-Host "SUCCESS: Trigger commit pushed to GitHub"
+        Write-Host "SUCCESS"
       } else {
-        Write-Error "FAILED: Could not push trigger commit"
+        Write-Error "FAILED"
         exit 1
       }
