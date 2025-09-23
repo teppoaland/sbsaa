@@ -127,7 +127,7 @@ def app_setup(driver):
 
 
 # Test Case 1: Main View Visibility
-@azure_work_item(1)  # Link to Azure DevOps Test Case 1
+@azure_work_item(16)  # Link to Azure DevOps Test Case 16
 @allure.feature("Main View")
 @allure.story("Home Tab Visibility")
 @allure.title("Verify HOME tab is visible on main view")
@@ -142,7 +142,7 @@ def test_home_tab(driver, app_setup):
 
 
 # Test Case 2: Oulu Search Functionality  
-@azure_work_item(2)  # Link to Azure DevOps Test Case 2
+@azure_work_item(17)  # Link to Azure DevOps Test Case 17
 @allure.feature("Search Functionality")
 @allure.story("City Search")
 @allure.title("Test Oulu city weather station search")
@@ -166,7 +166,7 @@ def test_oulu_search(driver, app_setup):
 
 
 # Test Case 3: Oulu Vihreasaari Station
-@azure_work_item(3)  # Link to Azure DevOps Test Case 3
+@azure_work_item(18)  # Link to Azure DevOps Test Case 18
 @allure.feature("Weather Stations")
 @allure.story("Specific Station Access")
 @allure.title("Test Oulu Vihreasaari weather station access")
@@ -199,7 +199,7 @@ def test_oulu_vihreasaari(driver, app_setup):
 
 
 # Test Case 4: Oulu Airport Station
-@azure_work_item(4)  # Link to Azure DevOps Test Case 4
+@azure_work_item(19)  # Link to Azure DevOps Test Case 19
 @allure.feature("Weather Stations")  
 @allure.story("Airport Weather Data")
 @allure.title("Test Oulu Airport weather station")
@@ -223,7 +223,7 @@ def test_oulu_airport(driver, app_setup):
 
 
 # Test Case 5: Warmest Temperature View
-@azure_work_item(5)  # Link to Azure DevOps Test Case 5
+@azure_work_item(20)  # Link to Azure DevOps Test Case 20
 @allure.feature("Temperature Views")
 @allure.story("Temperature Rankings") 
 @allure.title("Test warmest temperature view")
@@ -246,7 +246,7 @@ def test_warmest_view(driver, app_setup):
 
 
 # Test Case 6: Coldest Temperature View
-@azure_work_item(6)  # Link to Azure DevOps Test Case 6
+@azure_work_item(21)  # Link to Azure DevOps Test Case 21
 @allure.feature("Temperature Views")
 @allure.story("Temperature Rankings")
 @allure.title("Test coldest temperature view") 
@@ -268,7 +268,7 @@ def test_coldest_view(driver, app_setup):
 
 
 # Test Case 7: Rainiest Location View
-@azure_work_item(7)  # Link to Azure DevOps Test Case 7
+@azure_work_item(22)  # Link to Azure DevOps Test Case 22
 @allure.feature("Weather Conditions")
 @allure.story("Precipitation Data")
 @allure.title("Test rainiest location view")
@@ -290,7 +290,7 @@ def test_rainiest_view(driver, app_setup):
 
 
 # Test Case 8: Windiest Location View  
-@azure_work_item(8)  # Link to Azure DevOps Test Case 8
+@azure_work_item(23)  # Link to Azure DevOps Test Case 23
 @allure.feature("Weather Conditions")
 @allure.story("Wind Data")
 @allure.title("Test windiest location view")
@@ -312,7 +312,7 @@ def test_windiest_view(driver, app_setup):
 
 
 # Test Case 9: Records Tab Access
-@azure_work_item(9)  # Link to Azure DevOps Test Case 9
+@azure_work_item(24)  # Link to Azure DevOps Test Case 24
 @allure.feature("Navigation")
 @allure.story("Historical Data Access")
 @allure.title("Test weather records tab access")
@@ -334,7 +334,7 @@ def test_records_tab(driver, app_setup):
 
 
 # Test Case 10: Final Home Navigation Check
-@azure_work_item(10)  # Link to Azure DevOps Test Case 10
+@azure_work_item(25)  # Link to Azure DevOps Test Case 25
 @allure.feature("Navigation")
 @allure.story("Navigation Consistency") 
 @allure.title("Test final home navigation check")

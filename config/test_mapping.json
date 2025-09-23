@@ -1,52 +1,52 @@
 {
   "test_home_tab": {
-    "work_item_id": 1,
+    "work_item_id": 16,
     "work_item_type": "Test Case",
-    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/1"
+    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/16"
   },
   "test_oulu_search": {
-    "work_item_id": 2,
+    "work_item_id": 17,
     "work_item_type": "Test Case",
-    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/2"
+    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/17"
   },
   "test_oulu_vihreasaari": {
-    "work_item_id": 3,
+    "work_item_id": 18,
     "work_item_type": "Test Case",
-    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/3"
+    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/18"
   },
   "test_oulu_airport": {
-    "work_item_id": 4,
+    "work_item_id": 19,
     "work_item_type": "Test Case",
-    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/4"
+    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/19"
   },
   "test_warmest_view": {
-    "work_item_id": 5,
+    "work_item_id": 20,
     "work_item_type": "Test Case",
-    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/5"
+    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/20"
   },
   "test_coldest_view": {
-    "work_item_id": 6,
+    "work_item_id": 21,
     "work_item_type": "Test Case",
-    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/6"
+    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/21"
   },
   "test_rainiest_view": {
-    "work_item_id": 7,
+    "work_item_id": 22,
     "work_item_type": "Test Case",
-    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/7"
+    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/22"
   },
   "test_windiest_view": {
-    "work_item_id": 8,
+    "work_item_id": 23,
     "work_item_type": "Test Case",
-    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/8"
+    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/23"
   },
   "test_records_tab": {
-    "work_item_id": 9,
+    "work_item_id": 24,
     "work_item_type": "Test Case",
-    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/9"
+    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/24"
   },
   "test_final_home_check": {
-    "work_item_id": 10,
+    "work_item_id": 25,
     "work_item_type": "Test Case",
-    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/10"
+    "azure_url": "https://dev.azure.com/ttapani-solutions/test-automation-framework/_workitems/edit/25"
   }
 }
