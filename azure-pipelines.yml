@@ -1,28 +1,43 @@
-trigger: none
+# azure-trigger-test.yml
+trigger: none  # Manual only
+
 pool:
-  name: 'Default'
+  name: 'Default'  # Your self-hosted agent (or use vmImage if preferred)
+
 variables:
   GITHUB_REPO: "https://github.com/teppoaland/sbsaa.git"
-  GITHUB_PAT: $(GITHUB_PAT)
+  GITHUB_PAT: $(GITHUB_PAT)  # Stored as a secret in pipeline
+
 steps:
-- checkout: self
-  clean: true
+# No checkout needed
+- checkout: none
+
 - task: PowerShell@2
   displayName: 'Push trigger commit to GitHub'
   inputs:
     targetType: 'inline'
     script: |
+      # Temporary folder for cloning
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
       if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
       
+      # Clone repo using PAT for authentication
       $token = $env:GITHUB_PAT
       git clone https://$token@github.com/teppoaland/sbsaa.git $tempDir
+      
       cd $tempDir
+      
+      # Configure git user
       git config user.name "azure-pipelines"
       git config user.email "azure-pipelines@microsoft.com"
+      
+      # Create empty commit to trigger GH Actions
       git commit --allow-empty -m "[test] Trigger automated tests from Azure"
+      
+      # Push commit to main branch
       git push origin main
       
+      # Check result
       if ($LASTEXITCODE -eq 0) {
         Write-Host "SUCCESS: Trigger commit pushed to GitHub"
         Write-Host "GitHub Actions will handle the rest independently"
