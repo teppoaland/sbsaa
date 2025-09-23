@@ -1,39 +1,54 @@
-trigger: none
+# azure-trigger-test.yml
+trigger: none  # Manual only
+
 pool:
-  name: 'Default'
+  name: 'Default'  # Your self-hosted agent
 
 variables:
-  GITHUB_PAT_TOKEN: $(GITHUB-PAT)
+  GITHUB_PAT_TOKEN: $(GITHUB-PAT)  # Secret stored in Azure DevOps
 
 steps:
-- checkout: none
+- checkout: none  # We do manual clone
 
 - task: PowerShell@2
   displayName: 'Push trigger commit to GitHub'
   inputs:
     targetType: 'inline'
     script: |
+      $token = $env:GITHUB_PAT_TOKEN
+      if ([string]::IsNullOrEmpty($token)) {
+          Write-Error "GITHUB_PAT_TOKEN is empty!"
+          exit 1
+      }
+
+      $repoUrl = "https://github.com/teppoaland/sbsaa.git"
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
+
+      # Clean temp directory
       if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
 
-      $token = $env:GITHUB_PAT_TOKEN
-      Write-Host "Token available: $(![string]::IsNullOrEmpty($token))"
+      # Configure Git to store credentials temporarily
+      git config --global credential.helper store
+      Set-Content -Path "$env:USERPROFILE\.git-credentials" -Value "https://$token:@github.com"
 
-      git clone "https://$token@github.com/teppoaland/sbsaa.git" $tempDir
+      # Clone repo
+      git clone $repoUrl $tempDir
       cd $tempDir
 
+      # Configure Git user info
       git config user.name "azure-pipelines"
       git config user.email "azure-pipelines@microsoft.com"
 
+      # Create empty commit to trigger GitHub Actions
       git commit --allow-empty -m "[test] Trigger automated tests from Azure [skip ci]"
 
-      # ensure push uses token
-      git remote set-url origin "https://$token@github.com/teppoaland/sbsaa.git"
+      # Push commit to main
       git push origin main
 
       if ($LASTEXITCODE -eq 0) {
-        Write-Host "SUCCESS"
+          Write-Host "SUCCESS: Trigger commit pushed to GitHub"
+          Write-Host "GitHub Actions will handle the rest independently"
       } else {
-        Write-Error "FAILED"
-        exit 1
+          Write-Error "FAILED: Could not push trigger commit"
+          exit 1
       }
