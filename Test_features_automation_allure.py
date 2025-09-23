@@ -127,7 +127,7 @@ def app_setup(driver):
 
 
 # Test Case 1: Main View Visibility
-@azure_work_item(16)  # Link to Azure DevOps Test Case 16
+@azure_work_item(16)  # Link to Azure DevOps Test Case 16 - In Azure header: TC-001: Sää App - Check Main View Visibility
 @allure.feature("Main View")
 @allure.story("Home Tab Visibility")
 @allure.title("Verify HOME tab is visible on main view")
