@@ -2,7 +2,7 @@
 trigger: none  # Manual only
 
 pool:
-  name: 'Default'  # Your self-hosted agent if needed
+  vmImage: 'windows-latest'  # Instead of name: 'Default'
 
 variables:
   GITHUB_REPO: "https://github.com/teppoaland/sbsaa.git"  # Your GH repo
