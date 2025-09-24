@@ -1,14 +1,15 @@
 trigger: none
 pool:
-  name: 'Default'  # Use your self-hosted Windows agent
+  name: 'Default'
 variables:
-  GITHUB_PAT: $(GITHUB_PAT)
+  # Remove this line to avoid cyclical reference
+  # GITHUB_PAT: $(GITHUB_PAT)  
 steps:
 - checkout: none
 - task: PowerShell@2
   displayName: 'Push trigger commit to GitHub'
   env:
-    GITHUB_PAT: $(GITHUB_PAT)  # Explicit mapping for secret variables
+    GITHUB_PAT: $(GITHUB_PAT)  # Only map it here
   inputs:
     targetType: 'inline'
     script: |
@@ -24,7 +25,8 @@ steps:
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
       if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
       
-      git clone "https://$token@github.com/teppoaland/sbsaa.git" $tempDir
+      # Fix: Include username in git URL for proper authentication
+      git clone "https://github-actions:$token@github.com/teppoaland/sbsaa.git" $tempDir
       cd $tempDir
       git config user.name "azure-pipelines"
       git config user.email "azure-pipelines@microsoft.com"
