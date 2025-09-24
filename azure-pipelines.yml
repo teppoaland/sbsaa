@@ -1,7 +1,10 @@
+trigger: none
+pool:
+  name: 'Default'  # Use your self-hosted Windows agent
 variables:
   GITHUB_PAT: $(GITHUB_PAT)
-
 steps:
+- checkout: none
 - task: PowerShell@2
   displayName: 'Push trigger commit to GitHub'
   env:
@@ -16,17 +19,15 @@ steps:
           exit 1
       }
       
+      Write-Host "Token found, proceeding with git operations"
+      
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
-      if (Test-Path $tempDir) { 
-          Remove-Item $tempDir -Recurse -Force 
-      }
+      if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
       
       git clone "https://$token@github.com/teppoaland/sbsaa.git" $tempDir
       cd $tempDir
-      
       git config user.name "azure-pipelines"
       git config user.email "azure-pipelines@microsoft.com"
-      
       git commit --allow-empty -m "[test] Trigger from Azure"
       git push origin main
       
