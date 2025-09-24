@@ -1,36 +1,38 @@
-trigger: none
-pool:
-  name: 'Default'
 variables:
   GITHUB_PAT: $(GITHUB_PAT)
-  TEST_SIMPLE: "basic_test_value"
+
 steps:
-- checkout: none
 - task: PowerShell@2
-  displayName: 'Debug All Variables'
+  displayName: 'Push trigger commit to GitHub'
+  env:
+    GITHUB_PAT: $(GITHUB_PAT)  # Explicit mapping for secret variables
   inputs:
     targetType: 'inline'
     script: |
-      Write-Host "=== ALL ENVIRONMENT VARIABLES ==="
-      Get-ChildItem env: | Sort-Object Name | ForEach-Object {
-          if ($_.Name -like "*PAT*" -or $_.Name -like "*TOKEN*" -or $_.Name -like "*SECRET*") {
-              Write-Host "$($_.Name) = [REDACTED]"
-          } else {
-              Write-Host "$($_.Name) = $($_.Value)"
-          }
+      $token = $env:GITHUB_PAT
+      
+      if ([string]::IsNullOrEmpty($token)) {
+          Write-Error "GitHub PAT token is missing"
+          exit 1
       }
       
-      Write-Host "`n=== SPECIFIC CHECKS ==="
-      Write-Host "GITHUB_PAT exists: $([bool]$env:GITHUB_PAT)"
-      Write-Host "TEST_SIMPLE: '$env:TEST_SIMPLE'"
+      $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
+      if (Test-Path $tempDir) { 
+          Remove-Item $tempDir -Recurse -Force 
+      }
       
-      if ($env:TEST_SIMPLE -ne "basic_test_value") {
-          Write-Error "Even basic variables aren't working"
+      git clone "https://$token@github.com/teppoaland/sbsaa.git" $tempDir
+      cd $tempDir
+      
+      git config user.name "azure-pipelines"
+      git config user.email "azure-pipelines@microsoft.com"
+      
+      git commit --allow-empty -m "[test] Trigger from Azure"
+      git push origin main
+      
+      if ($LASTEXITCODE -eq 0) {
+          Write-Host "SUCCESS: GitHub Actions triggered"
       } else {
-          Write-Host "Basic variables work, checking PAT..."
-          if ([string]::IsNullOrEmpty($env:GITHUB_PAT)) {
-              Write-Error "PAT variable is empty"
-          } else {
-              Write-Host "PAT variable has content (length: $($env:GITHUB_PAT.Length))"
-          }
+          Write-Error "Push failed"
+          exit 1
       }
