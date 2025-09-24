@@ -2,7 +2,7 @@ trigger: none
 pool:
   name: 'Default'
 variables:
-  GITHUB_PAT: $(GITHUB-PAT)
+  GITHUB_PAT: $(GITHUB_PAT)
   TEST_SIMPLE: "basic_test_value"
 steps:
 - checkout: none
