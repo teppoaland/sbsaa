@@ -1,15 +1,12 @@
 trigger: none
 pool:
   name: 'Default'
-variables:
-  # Remove this line to avoid cyclical reference
-  # GITHUB_PAT: $(GITHUB_PAT)  
 steps:
 - checkout: none
 - task: PowerShell@2
   displayName: 'Push trigger commit to GitHub'
   env:
-    GITHUB_PAT: $(GITHUB_PAT)  # Only map it here
+    GITHUB_PAT: $(GITHUB_PAT)
   inputs:
     targetType: 'inline'
     script: |
@@ -25,7 +22,6 @@ steps:
       $tempDir = "$env:AGENT_TEMPDIRECTORY/gh-trigger"
       if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
       
-      # Fix: Include username in git URL for proper authentication
       git clone "https://github-actions:$token@github.com/teppoaland/sbsaa.git" $tempDir
       cd $tempDir
       git config user.name "azure-pipelines"
